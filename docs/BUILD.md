@@ -164,3 +164,59 @@ Expected: left shows `ZMK_STUDIO=y`, `ZMK_INPUT_LISTENER=y`, `..._TEMP_LAYER=y`,
 `ZMK_POINTING=y`. Right shows `ZMK_INPUT_SPLIT=y`, `PMW3610=y`, `ZMK_POINTING=y`, and
 **no** `CONFIG_ZMK_INPUT_LISTENER` line at all — that absence is the central-only gate
 working, not a mistake.
+
+## 10. Publishing a release
+
+Only publish once the Actions build of the commit you intend to tag is green, and once
+nothing under `docs/`, `README.md` or the release notes contains a local path, an account
+name other than the owner's GitHub handle, or a token.
+
+```bash
+R=OWNER/REPO                                  # debpolaris/keyball61-left-central-zmk
+
+# 1. build the commit and confirm it is green
+git push origin main
+gh run list --repo "$R" --workflow build.yml --limit 1
+gh run watch <run-id> --repo "$R" --exit-status
+
+# 2. take the binaries out of that run
+aid=$(gh api "repos/$R/actions/artifacts" --jq ".artifacts[] | select(.name==\"firmware\") | .id" | head -1)
+gh api "repos/$R/actions/artifacts/$aid/zip" > /tmp/firmware.zip
+mkdir -p /tmp/firmware && cd /tmp/firmware && unzip -o /tmp/firmware.zip
+
+# 3. rename (the artifact names contain spaces, which breaks sha256sum -c and URLs),
+#    checksum, and commit into firmware/
+for f in *; do mv "$f" "${f// /_}"; done
+sha256sum *.uf2 > SHA256SUMS.txt
+sha256sum -c SHA256SUMS.txt
+```
+
+Copy the files into the repo's `firmware/`, commit, then tag the commit whose build produced
+them and publish:
+
+```bash
+git tag v1.0.1
+git push origin v1.0.1          # a tag push also runs the build workflow
+
+gh release create v1.0.1 \
+  firmware/*.uf2 firmware/SHA256SUMS.txt \
+  --target "$(git rev-parse v1.0.1)" \
+  --title "..." --notes-file /path/to/notes.md
+
+gh release view v1.0.1 --repo "$R" --json assets --jq ".assets[].name"
+```
+
+`--target` needs the **full** SHA; a short SHA fails with
+`HTTP 422: Release.target_commitish is invalid`.
+
+Switching the repository itself between public and private:
+
+```bash
+gh repo edit "$R" --visibility public --accept-visibility-change-consequences   # gh ≥ 2.5x
+gh api -X PATCH "repos/$R" -f private=false                                   # older gh
+gh repo view "$R" --json visibility                                            # confirm either way
+```
+
+The `gh repo change-visibility` subcommand does not exist in every build, and `gh repo
+edit` has no visibility flag in some versions — check `gh repo edit --help` before assuming,
+and always re-read the visibility afterwards instead of trusting the command's exit status.
