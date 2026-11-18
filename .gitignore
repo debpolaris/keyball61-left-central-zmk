@@ -1,0 +1,17 @@
+# west / zephyr build trees
+build/
+*.uf2
+!firmware/*.uf2
+
+# python venv used by the ZMK toolchain
+.venv/
+venv/
+__pycache__/
+*.pyc
+
+# editors / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.swp
