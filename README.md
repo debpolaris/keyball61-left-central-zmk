@@ -127,7 +127,7 @@ Everything you are likely to want to change, with file and line:
 | [docs/FLASH.md](docs/FLASH.md) | flash order, re-pairing, what each screen should show |
 | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | how the trackball reaches the host across the split, pin map, Kconfig gates |
 | [docs/TUNING.md](docs/TUNING.md) | every knob, its file, its range, what breaks if you move it |
-| [docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md) | the six failures this config went through, symptom → cause → fix |
+| [docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md) | build failures and runtime oddities, symptom → cause → fix |
 | [docs/PROVENANCE.md](docs/PROVENANCE.md) | what is verified, what is reconstructed, exact commit SHAs |
 | [ATTRIBUTION.md](ATTRIBUTION.md) | sources and licence status of everything reused here |
 
