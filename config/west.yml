@@ -2,15 +2,18 @@ manifest:
   remotes:
     - name: zmkfirmware
       url-base: https://github.com/zmkfirmware
-    - name: tangbonze
-      url-base: https://github.com/tangbonze
+    - name: badjeff
+      url-base: https://github.com/badjeff
   projects:
     - name: zmk
       remote: zmkfirmware
       revision: v0.3
       import: app/west.yml
+    # A driver that only reports raw XY deltas. Layer-dependent behaviour
+    # (auto-mouse, scroll, snipe) is handled on the central half instead, so the
+    # sensor keeps working while it sits on the peripheral half.
     - name: zmk-pmw3610-driver
-      remote: tangbonze
-      revision: main
+      remote: badjeff
+      revision: zmk-0.3
   self:
     path: config

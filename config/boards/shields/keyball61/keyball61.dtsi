@@ -100,3 +100,37 @@
         diode-direction = "col2row";
     };
 };
+
+/*
+ * Trackball plumbing for a split board where the sensor is on the peripheral half.
+ *
+ * This block is compiled into BOTH halves, which is required:
+ *   right (peripheral) overlay -> sets trackball_split's `device` to the sensor
+ *   left  (central)    overlay -> enables trackball_listener and attaches processors
+ *
+ * A peripheral half has no keymap, so nothing that needs a layer may run there. The
+ * sensor only reports raw relative motion; the central turns that into mouse, scroll
+ * and snipe behaviour.
+ *
+ * Gating in ZMK v0.3 (app/src/pointing/Kconfig):
+ *   ZMK_INPUT_SPLIT          needs ZMK_POINTING + ZMK_SPLIT            -> both halves
+ *   ZMK_INPUT_LISTENER       needs ZMK_POINTING + central role         -> left only
+ *   ZMK_INPUT_PROCESSOR_*    scaler/mapper are unconditional, temp-layer is central
+ */
+/ {
+    split_inputs {
+        #address-cells = <1>;
+        #size-cells = <0>;
+
+        trackball_split: trackball_split@0 {
+            compatible = "zmk,input-split";
+            reg = <0>;
+        };
+    };
+
+    trackball_listener: trackball_listener {
+        compatible = "zmk,input-listener";
+        device = <&trackball_split>;
+        status = "disabled";
+    };
+};

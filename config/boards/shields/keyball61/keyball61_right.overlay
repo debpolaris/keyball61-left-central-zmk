@@ -5,6 +5,7 @@
  */
  
 #include "keyball61.dtsi"
+#include <zephyr/dt-bindings/input/input-event-codes.h>
 
 &default_transform {
     col-offset = <7>;
@@ -82,13 +83,17 @@ nice_view_spi: &spi2 {
 
     trackball: trackball@0 {
         status = "okay";
-        compatible = "zmk,pmw3610";
+        compatible = "pixart,pmw3610";
         reg = <0>;
         spi-max-frequency = <2000000>;
         irq-gpios = <&gpio1 11 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>;
-        automouse-layer = <4>;
-		scroll-layers = <5>;
-		snipe-layers = <6>;
+        cpi = <1200>;
+        evt-type = <INPUT_EV_REL>;
+        x-input-code = <INPUT_REL_X>;
+        y-input-code = <INPUT_REL_Y>;
+        /* Old driver equivalent: CONFIG_PMW3610_ORIENTATION_180=y. */
+        invert-x;
+        invert-y;
     };
 };
 
@@ -133,10 +138,11 @@ nice_view_spi: &spi2 {
     };
 };
 
-/ {
-  trackball_listener {
-    compatible = "zmk,input-listener";
+/*
+ * Hand the sensor to zmk,input-split so its events reach the central half.
+ * The listener and every layer-dependent processor live in keyball61_left.overlay:
+ * a peripheral has no keymap, so automouse/scroll/snipe cannot run here.
+ */
+&trackball_split {
     device = <&trackball>;
-
-  };
 };

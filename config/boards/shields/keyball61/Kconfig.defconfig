@@ -1,4 +1,6 @@
-if SHIELD_KEYBALL61_RIGHT
+# The left half is the central (main) half: it owns the BLE connection to the
+# host, the keyboard name, USB and ZMK Studio. The right half is the peripheral.
+if SHIELD_KEYBALL61_LEFT
 
 config ZMK_KEYBOARD_NAME
 	default "Keyball61"

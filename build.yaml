@@ -1,8 +1,18 @@
 include:
+  # Left = central (main). USB, ZMK Studio and the keymap live here.
+  # nice_view_adapter is deliberately absent: keyball61_left.overlay already labels
+  # spi2 as nice_view_spi on the pins this board actually uses, and adding the adapter
+  # makes the build fail with a duplicate nice_view_spi label.
   - board: nice_nano_v2
-    shield: keyball61_left nice_view_adapter nice_view
+    shield: keyball61_left nice_view
+    snippet: studio-rpc-usb-uart
+
+  # Right = peripheral, carries the PMW3610 trackball. Its overlay defines
+  # nice_view_spi the same way, so the adapter is off here too.
   - board: nice_nano_v2
     shield: keyball61_right nice_view
-    snippet: studio-rpc-usb-uart
+
+  # Flash this to both halves once after any change of central/peripheral role.
+  # Skipping it leaves the old split pairing in flash and no key will register.
   - board: nice_nano_v2
     shield: settings_reset
